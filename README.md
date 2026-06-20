@@ -6,6 +6,8 @@ CamStreamer apps directly over the LAN — the Touch Portal sibling of the Strea
 (VAPIX + CamStreamer/CamOverlay/CamSwitcher CGIs), with HTTP digest auth, and pushes
 live state back to Touch Portal.
 
+<img width="897" height="485" alt="touch-portal-mobile-control-deck" src="https://github.com/user-attachments/assets/1d99f098-fd6f-4319-ab14-86491548b0cf" />
+
 ## Actions
 
 | Action | What it does |
