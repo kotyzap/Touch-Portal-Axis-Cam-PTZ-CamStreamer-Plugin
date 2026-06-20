@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Touch Portal for Axis Cameras &amp; CamStreamer — LAN control plugin</title>
+<meta name="description" content="A Touch Portal plugin that controls Axis IP cameras and CamStreamer apps directly over the LAN: PTZ presets, guarded tours, streams, CamOverlay widgets and CamSwitcher views, with live state pushed back to your buttons." />
+<meta name="keywords" content="Touch Portal, Axis camera, CamStreamer, CamOverlay, CamSwitcher, VAPIX, PTZ preset, guarded tour, IP camera control, plugin" />
+<meta name="author" content="Pavel Kotyza" />
+<link rel="canonical" href="https://pavelkotyza.github.io/touch-portal-for-axis/" />
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Touch Portal for Axis Cameras & CamStreamer" />
+<meta property="og:description" content="Control Axis IP cameras and CamStreamer apps from Touch Portal over the LAN — PTZ, tours, streams, overlays and views with live button state." />
+<meta property="og:image" content="img/touch-portal-mobile-control-deck.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<style>
+  :root {
+    --bg: #f6f8fa;
+    --surface: #ffffff;
+    --surface-alt: #f0f3f6;
+    --text: #1b1f24;
+    --text-muted: #57606a;
+    --border: #d8dee4;
+    --accent: #e8730a;
+    --accent-contrast: #ffffff;
+    --code-bg: #f0f3f6;
+    --shadow: 0 1px 3px rgba(27,31,36,.08), 0 8px 24px rgba(27,31,36,.06);
+  }
+  [data-theme="dark"] {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-alt: #1c232c;
+    --text: #e6edf3;
+    --text-muted: #9198a1;
+    --border: #30363d;
+    --accent: #f0830f;
+    --accent-contrast: #1b1f24;
+    --code-bg: #1c232c;
+    --shadow: 0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.4);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  header.site {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: saturate(180%) blur(6px);
+  }
+  header.site .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 12px; padding-bottom: 12px;
+  }
+  .brand { font-weight: 700; font-size: 1.05rem; display: flex; align-items: center; gap: 8px; }
+  .brand .dot { width: 12px; height: 12px; border-radius: 3px; background: var(--accent); display: inline-block; }
+  nav.top a { color: var(--text-muted); margin-left: 18px; font-size: .92rem; }
+  nav.top a:hover { color: var(--text); text-decoration: none; }
+  .theme-toggle {
+    margin-left: 18px; cursor: pointer;
+    background: var(--surface-alt); border: 1px solid var(--border);
+    color: var(--text); border-radius: 8px; padding: 6px 10px; font-size: .85rem;
+  }
+  .theme-toggle:hover { border-color: var(--accent); }
+
+  .hero { padding: 64px 0 40px; text-align: center; }
+  .hero h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 14px; }
+  .hero p.lead { font-size: 1.18rem; color: var(--text-muted); max-width: 720px; margin: 0 auto 26px; }
+  .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 26px; }
+  .badge { background: var(--surface-alt); border: 1px solid var(--border); border-radius: 999px; padding: 4px 12px; font-size: .82rem; color: var(--text-muted); }
+  .cta { display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: var(--accent-contrast); padding: 12px 22px; border-radius: 10px; font-weight: 600; }
+  .cta:hover { text-decoration: none; opacity: .92; }
+  .hero img { max-width: 100%; border-radius: 14px; box-shadow: var(--shadow); margin-top: 40px; }
+
+  section { padding: 44px 0; border-top: 1px solid var(--border); }
+  section h2 { font-size: 1.6rem; margin: 0 0 18px; }
+  section h3 { font-size: 1.15rem; margin: 28px 0 10px; }
+  p { margin: 0 0 16px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; background: var(--surface); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: .95rem; vertical-align: top; }
+  th { background: var(--surface-alt); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+
+  ul.states { list-style: none; padding: 0; }
+  ul.states li { padding: 8px 0; border-bottom: 1px dashed var(--border); }
+  ul.states li:last-child { border-bottom: none; }
+
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 5px; font-size: .88em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  figure img { width: 100%; display: block; background: var(--surface-alt); }
+  figcaption { padding: 10px 14px; font-size: .9rem; color: var(--text-muted); }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { position: relative; padding: 0 0 18px 44px; }
+  .steps li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: var(--accent-contrast); display: grid; place-items: center; font-weight: 700; font-size: .9rem; }
+
+  footer.site { padding: 36px 0 56px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: .9rem; text-align: center; }
+  @media (max-width: 600px) { .hero h1 { font-size: 1.8rem; } nav.top a { margin-left: 12px; } }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span> Touch Portal for Axis</div>
+    <nav class="top">
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#gallery">Screenshots</a>
+      <a href="#build">Build</a>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle color theme">🌙 Dark</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" style="border-top:none;">
+    <div class="wrap">
+      <h1>Touch Portal for Axis Cameras&nbsp;&amp; CamStreamer</h1>
+      <p class="lead">A <a href="https://www.touch-portal.com/" target="_blank" rel="noopener">Touch Portal</a> plugin that controls Axis IP cameras and CamStreamer apps directly over the LAN — talking straight to the camera (VAPIX + CamStreamer / CamOverlay / CamSwitcher CGIs) with HTTP digest auth, and pushing live state back to your buttons.</p>
+      <div class="badges">
+        <span class="badge">VAPIX</span>
+        <span class="badge">CamStreamer</span>
+        <span class="badge">CamOverlay</span>
+        <span class="badge">CamSwitcher</span>
+        <span class="badge">HTTP digest auth</span>
+        <span class="badge">Live button state</span>
+      </div>
+      <div><a class="cta" href="#install">Get started →</a></div>
+      <img src="img/touch-portal-mobile-control-deck.png" alt="Touch Portal Axis Control page with PTZ Preset, Guard Tour, YouTube LIVE, RTMP LIVE, CamSwitcher View, AccuWeather Overlay and Refresh buttons" loading="lazy" />
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>Actions</h2>
+      <table>
+        <thead><tr><th>Action</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><strong>PTZ Preset</strong></td><td>Go to a server preset position, or Home (per view-area channel).</td></tr>
+          <tr><td><strong>AXIS Guarded Tour</strong></td><td>Start / stop a Guarded Tour. Stops other tours on the same channel first.</td></tr>
+          <tr><td><strong>CamStreamer Stream</strong></td><td>Start / stop / toggle a CamStreamer stream.</td></tr>
+          <tr><td><strong>CamOverlay Widget</strong></td><td>Show / hide / toggle a CamOverlay service.</td></tr>
+          <tr><td><strong>CamSwitcher Source</strong></td><td>Switch to a CamSwitcher view / playlist.</td></tr>
+          <tr><td><strong>Refresh / Discover</strong></td><td>Re-read presets, tours, streams, overlays and views from the camera.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Live state for button visuals</h3>
+      <p>The plugin polls the camera and exposes Touch Portal <strong>States</strong> you can bind to button icons/text or use in event logic:</p>
+      <ul class="states">
+        <li><code>Axis: Connection</code> — <code>ok</code> / <code>error</code> / <code>unknown</code></li>
+        <li><code>Axis: Stream &lt;id&gt; state</code> — <code>on</code> / <code>off</code> / <code>unknown</code> (created per discovered stream)</li>
+        <li><code>Axis: Overlay &lt;id&gt; state</code> — <code>on</code> / <code>off</code> / <code>unknown</code></li>
+        <li><code>Axis: Guard tour &lt;id&gt; state</code> — <code>running</code> / <code>stopped</code></li>
+        <li><code>Axis: Active CamSwitcher view</code></li>
+        <li><code>Axis: Last action result</code></li>
+      </ul>
+
+      <h3>Settings</h3>
+      <p>Configure once in Touch Portal → Settings → Plug-ins → <em>Touch Portal for Axis…</em>: Camera IP/hostname, Port, Username, Password, <em>Use HTTPS (yes/no)</em>, <em>Poll interval (seconds)</em>.</p>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2>Install the plugin</h2>
+      <ol class="steps">
+        <li>In Touch Portal, open <strong>Settings → Plug-ins → Import plug-in…</strong> and choose the <code>.tpp</code> file. Touch Portal imports <code>touch-portal-for-axis/plugin/plugin.js</code>.</li>
+        <li>Approve the trust prompt — the plugin runs <code>node "%TP_PLUGIN_FOLDER%touch-portal-for-axis/plugin/plugin.js"</code> on startup. Choose <strong>Trust Always</strong> or <strong>OK</strong>.</li>
+        <li>Once imported successfully, fill in your <strong>Camera IP / hostname</strong>, port, username, password and HTTPS option, then <strong>Save</strong>.</li>
+        <li>Add Axis actions to any button from the <strong>Axis Cam + CamStreamer</strong> category in the button editor.</li>
+      </ol>
+
+      <h3>Starter page (optional)</h3>
+      <p>Import the included <strong>Axis Control</strong> page template to get a ready-made button layout. The page requires the <code>com.4xsdev.axis-tp</code> plugin (this one) to be installed.</p>
+    </div>
+  </section>
+
+  <section id="gallery">
+    <div class="wrap">
+      <h2>Screenshots</h2>
+      <div class="gallery">
+        <figure><img src="img/touch-portal-import-plugin-communication-settings.png" alt="Touch Portal communication settings importing the Axis plugin" loading="lazy" /><figcaption>Importing the plugin from Communication Settings.</figcaption></figure>
+        <figure><img src="img/touch-portal-import-plugin-progress.png" alt="Touch Portal importing plugin progress bar" loading="lazy" /><figcaption>Import progress — bundling plugin.js.</figcaption></figure>
+        <figure><img src="img/touch-portal-axis-plugin-trust-prompt.png" alt="Touch Portal untrusted plugin trust prompt for the Axis camera plugin" loading="lazy" /><figcaption>Trust prompt before the plugin runs Node.</figcaption></figure>
+        <figure><img src="img/touch-portal-axis-plugin-imported-success.png" alt="Axis camera plugin imported successfully in Touch Portal settings" loading="lazy" /><figcaption>Plugin imported successfully.</figcaption></figure>
+        <figure><img src="img/touch-portal-axis-camera-connection-settings.png" alt="Axis camera connection settings: IP, port, username and password" loading="lazy" /><figcaption>Camera connection settings.</figcaption></figure>
+        <figure><img src="img/touch-portal-axis-camstreamer-actions-list.png" alt="Axis Cam and CamStreamer action list in the Touch Portal button editor" loading="lazy" /><figcaption>Axis Cam + CamStreamer action list.</figcaption></figure>
+        <figure><img src="img/touch-portal-camoverlay-widget-action.png" alt="CamOverlay Widget action configured to toggle a service" loading="lazy" /><figcaption>CamOverlay Widget action on a button.</figcaption></figure>
+        <figure><img src="img/touch-portal-camoverlay-widget-dropdown.png" alt="CamOverlay widget dropdown listing discovered services" loading="lazy" /><figcaption>Discovered CamOverlay services in the dropdown.</figcaption></figure>
+        <figure><img src="img/touch-portal-import-axis-control-page.png" alt="Touch Portal importing the Axis Control page template" loading="lazy" /><figcaption>Importing the Axis Control page template.</figcaption></figure>
+        <figure><img src="img/touch-portal-import-page-success.png" alt="Axis Control page imported, requiring the Axis Touch Portal plugin" loading="lazy" /><figcaption>Page imported — requires the plugin.</figcaption></figure>
+        <figure><img src="img/touch-portal-open-imported-page-prompt.png" alt="Prompt to open the imported Touch Portal page" loading="lazy" /><figcaption>Open the imported page.</figcaption></figure>
+        <figure><img src="img/touch-portal-mobile-control-deck.png" alt="Touch Portal control deck on a mobile device" loading="lazy" /><figcaption>The control deck on a mobile device.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="build">
+    <div class="wrap">
+      <h2>Build from source</h2>
+      <p>Requires Node.js (the launch command runs <code>node plugin/plugin.js</code>; Touch Portal users need Node installed, or repackage as a standalone binary).</p>
+      <pre><code>npm install
+npm run build   # bundles src/ -&gt; plugin/plugin.js (single CommonJS file)
+npm run pack    # produces dist/touch-portal-for-axis-v1.0.0.tpp</code></pre>
+      <p>Import the resulting <code>.tpp</code> via Touch Portal → Settings → Plug-ins → <em>Import plug-in…</em></p>
+
+      <h3>Standalone (no Node on the target machine)</h3>
+      <p>To avoid requiring Node on end-user machines, compile <code>plugin/plugin.js</code> to a binary with <a href="https://github.com/yao-pkg/pkg" target="_blank" rel="noopener"><code>@yao-pkg/pkg</code></a> and point the <code>plugin_start_cmd_*</code> lines in <code>plugin/entry.tp</code> at the produced executable instead of <code>node …</code>.</p>
+
+      <h3>How it maps to the Stream Deck plugin</h3>
+      <p>The camera layer (<code>src/camera.ts</code>) is a near-verbatim port of the Stream Deck plugin's <code>gateway.ts</code>: same digest auth, same discovery endpoints, same <code>sendCmd</code> action names (<code>ptz.preset</code>, <code>ptz.home</code>, <code>guardtour.start/stop</code>, <code>stream.set</code>, <code>overlay.toggle</code>, <code>view.switch</code>). The difference is the front end: instead of Stream Deck's HTML Property Inspector, Touch Portal uses dynamically-populated dropdown choices (<code>choiceUpdate</code>) and runtime-created States (<code>createState</code>) delivered over the TCP plugin protocol (<code>src/tp.ts</code>).</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    <p>Touch Portal for Axis Cameras &amp; CamStreamer — the Touch Portal sibling of the Stream Deck <em>Axis Cam + CamStreamer</em> plugin.</p>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.getElementById('themeToggle');
+    function apply(theme) {
+      root.setAttribute('data-theme', theme);
+      btn.textContent = theme === 'dark' ? '☀️ Light' : '🌙 Dark';
+    }
+    // Default light; honor saved choice if present.
+    var saved = null;
+    try { saved = localStorage.getItem('tp-axis-theme'); } catch (e) {}
+    apply(saved || 'light');
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      apply(next);
+      try { localStorage.setItem('tp-axis-theme', next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>
