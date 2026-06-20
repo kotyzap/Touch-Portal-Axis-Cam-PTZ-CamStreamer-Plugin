@@ -1,0 +1,223 @@
+{
+    "sdk": 6,
+    "api": 7,
+    "version": 100,
+    "name": "Touch Portal for Axis Camera & CamStreamer Apps",
+    "id": "com.4xsdev.axis-tp",
+    "plugin_start_cmd_windows": "node \"%TP_PLUGIN_FOLDER%touch-portal-for-axis\\plugin\\plugin.js\"",
+    "plugin_start_cmd_mac": "/bin/bash %TP_PLUGIN_FOLDER%touch-portal-for-axis/plugin/start.sh",
+    "plugin_start_cmd_linux": "/bin/bash %TP_PLUGIN_FOLDER%touch-portal-for-axis/plugin/start.sh",
+    "configuration": {
+        "colorDark": "#1B2A41",
+        "colorLight": "#2D8CFF"
+    },
+    "settings": [
+        {
+            "name": "Camera IP / hostname",
+            "type": "text",
+            "default": "",
+            "maxLength": 120,
+            "readOnly": false,
+            "tooltip": { "body": "IP address or hostname of the Axis camera, e.g. 192.168.0.90" }
+        },
+        {
+            "name": "Port",
+            "type": "number",
+            "default": "80",
+            "minValue": 1,
+            "maxValue": 65535,
+            "readOnly": false,
+            "tooltip": { "body": "HTTP port (80) or HTTPS port (443)." }
+        },
+        {
+            "name": "Username",
+            "type": "text",
+            "default": "root",
+            "maxLength": 64,
+            "readOnly": false
+        },
+        {
+            "name": "Password",
+            "type": "text",
+            "default": "",
+            "maxLength": 128,
+            "isPassword": true,
+            "readOnly": false
+        },
+        {
+            "name": "Use HTTPS (yes/no)",
+            "type": "text",
+            "default": "no",
+            "maxLength": 3,
+            "readOnly": false,
+            "tooltip": { "body": "Type 'yes' to use TLS/HTTPS, otherwise 'no'." }
+        },
+        {
+            "name": "Poll interval (seconds)",
+            "type": "number",
+            "default": "3",
+            "minValue": 1,
+            "maxValue": 60,
+            "readOnly": false,
+            "tooltip": { "body": "How often live state (streams, overlays, tours) is refreshed." }
+        }
+    ],
+    "categories": [
+        {
+            "id": "com.4xsdev.axis-tp.cat",
+            "name": "Axis Cam + CamStreamer",
+            "imagepath": "%TP_PLUGIN_FOLDER%touch-portal-for-axis/plugin/axis-icon.png",
+            "actions": [
+                {
+                    "id": "com.4xsdev.axis-tp.act.preset",
+                    "name": "PTZ Preset",
+                    "prefix": "Axis",
+                    "type": "communicate",
+                    "tryInline": true,
+                    "description": "Go to a PTZ preset position (or Home).",
+                    "format": "Go to PTZ preset {$com.4xsdev.axis-tp.data.preset$}",
+                    "data": [
+                        {
+                            "id": "com.4xsdev.axis-tp.data.preset",
+                            "type": "choice",
+                            "label": "Preset",
+                            "default": "(refresh to load)",
+                            "valueChoices": ["(refresh to load)"]
+                        }
+                    ]
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.act.guardtour",
+                    "name": "AXIS Guarded Tour",
+                    "prefix": "Axis",
+                    "type": "communicate",
+                    "tryInline": true,
+                    "description": "Start or stop an AXIS Guarded Tour. Only one tour runs per view area.",
+                    "format": "Guarded Tour {$com.4xsdev.axis-tp.data.tour$} — {$com.4xsdev.axis-tp.data.gtmode$}",
+                    "data": [
+                        {
+                            "id": "com.4xsdev.axis-tp.data.tour",
+                            "type": "choice",
+                            "label": "Tour",
+                            "default": "(refresh to load)",
+                            "valueChoices": ["(refresh to load)"]
+                        },
+                        {
+                            "id": "com.4xsdev.axis-tp.data.gtmode",
+                            "type": "choice",
+                            "label": "Mode",
+                            "default": "Start",
+                            "valueChoices": ["Start", "Stop"]
+                        }
+                    ]
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.act.stream",
+                    "name": "CamStreamer Stream",
+                    "prefix": "Axis",
+                    "type": "communicate",
+                    "tryInline": true,
+                    "description": "Start or stop a CamStreamer stream.",
+                    "format": "CamStreamer stream {$com.4xsdev.axis-tp.data.stream$} — {$com.4xsdev.axis-tp.data.stmode$}",
+                    "data": [
+                        {
+                            "id": "com.4xsdev.axis-tp.data.stream",
+                            "type": "choice",
+                            "label": "Stream",
+                            "default": "(refresh to load)",
+                            "valueChoices": ["(refresh to load)"]
+                        },
+                        {
+                            "id": "com.4xsdev.axis-tp.data.stmode",
+                            "type": "choice",
+                            "label": "Mode",
+                            "default": "Toggle",
+                            "valueChoices": ["On", "Off", "Toggle"]
+                        }
+                    ]
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.act.overlay",
+                    "name": "CamOverlay Widget",
+                    "prefix": "Axis",
+                    "type": "communicate",
+                    "tryInline": true,
+                    "description": "Show or hide a CamOverlay widget / service.",
+                    "format": "CamOverlay widget {$com.4xsdev.axis-tp.data.overlay$} — {$com.4xsdev.axis-tp.data.ovmode$}",
+                    "data": [
+                        {
+                            "id": "com.4xsdev.axis-tp.data.overlay",
+                            "type": "choice",
+                            "label": "Widget",
+                            "default": "(refresh to load)",
+                            "valueChoices": ["(refresh to load)"]
+                        },
+                        {
+                            "id": "com.4xsdev.axis-tp.data.ovmode",
+                            "type": "choice",
+                            "label": "Mode",
+                            "default": "Toggle",
+                            "valueChoices": ["Show", "Hide", "Toggle"]
+                        }
+                    ]
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.act.view",
+                    "name": "CamSwitcher Source",
+                    "prefix": "Axis",
+                    "type": "communicate",
+                    "tryInline": true,
+                    "description": "Switch to a CamSwitcher view / playlist.",
+                    "format": "Switch CamSwitcher view to {$com.4xsdev.axis-tp.data.view$}",
+                    "data": [
+                        {
+                            "id": "com.4xsdev.axis-tp.data.view",
+                            "type": "choice",
+                            "label": "View",
+                            "default": "(refresh to load)",
+                            "valueChoices": ["(refresh to load)"]
+                        }
+                    ]
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.act.refresh",
+                    "name": "Refresh / Discover camera",
+                    "prefix": "Axis",
+                    "type": "communicate",
+                    "tryInline": true,
+                    "description": "Re-discover presets, tours, streams, overlays and views from the camera.",
+                    "format": "Refresh Axis camera lists & state",
+                    "data": []
+                }
+            ],
+            "states": [
+                {
+                    "id": "com.4xsdev.axis-tp.state.connection",
+                    "type": "choice",
+                    "desc": "Axis: Connection",
+                    "default": "unknown",
+                    "valueChoices": ["unknown", "ok", "error"]
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.state.lastResult",
+                    "type": "text",
+                    "desc": "Axis: Last action result",
+                    "default": ""
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.state.activeView",
+                    "type": "text",
+                    "desc": "Axis: Active CamSwitcher view",
+                    "default": ""
+                },
+                {
+                    "id": "com.4xsdev.axis-tp.state.activePreset",
+                    "type": "text",
+                    "desc": "Axis: Active PTZ preset",
+                    "default": ""
+                }
+            ],
+            "events": []
+        }
+    ]
+}
