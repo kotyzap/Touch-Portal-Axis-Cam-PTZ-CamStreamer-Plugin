@@ -1,0 +1,23 @@
+{
+    "name": "touch-portal-for-axis",
+    "version": "1.0.0",
+    "description": "Touch Portal plugin — control Axis cameras and CamStreamer apps: PTZ presets, Guarded Tours, CamStreamer streams, CamOverlay widgets and CamSwitcher sources, with live state.",
+    "type": "module",
+    "author": "Pavel Kotyza",
+    "license": "MIT",
+    "scripts": {
+        "build": "rollup -c",
+        "watch": "rollup -c -w",
+        "pack": "node scripts/pack.mjs"
+    },
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "^28.0.0",
+        "@rollup/plugin-node-resolve": "^16.0.0",
+        "@rollup/plugin-typescript": "^12.1.0",
+        "@types/node": "^20.16.0",
+        "archiver": "^7.0.1",
+        "rollup": "^4.24.0",
+        "tslib": "^2.7.0",
+        "typescript": "^5.6.0"
+    }
+}
